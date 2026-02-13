@@ -1,9 +1,18 @@
 import sqlite3
+import os
+
+DB_PATH = "data/facility.db"
+
+def get_connection():
+    os.makedirs("data", exist_ok=True)
+    return sqlite3.connect(DB_PATH, check_same_thread=False)
+
 
 def init_db():
-    conn = sqlite3.connect("database.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
+    # Departments Table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS departments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,17 +20,30 @@ def init_db():
         )
     """)
 
-    # Insert default departments if empty
+    # Insert default departments only if empty
     cursor.execute("SELECT COUNT(*) FROM departments")
     count = cursor.fetchone()[0]
 
     if count == 0:
         departments = [
+            ("HVAC",),
             ("Electrical",),
-            ("Mechanical",),
-            ("Housekeeping",),
-            ("Security",)
+            ("DG",),
+            ("STP",),
+            ("WTP",),
+            ("Fire Fighting",),
+            ("CCTV & Access",),
+            ("Lifts",),
+            ("BMS",),
+            ("Facade",),
+            ("Civil",),
+            ("Compliance",),
+            ("Energy",),
+            ("Stores",),
+            ("Purchase",),
+            ("Administration",)
         ]
+
         cursor.executemany(
             "INSERT INTO departments (name) VALUES (?)",
             departments
