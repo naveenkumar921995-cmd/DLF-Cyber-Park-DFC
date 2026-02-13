@@ -53,7 +53,7 @@ elif st.session_state.role == "Admin":
     # -------------------------
     if menu == "Dashboard":
 
-    st.title("🏢 DLF CYBER PARK Facility Control Room")
+    st.title("🏢 Facility Control Room")
 
     from database.db import get_connection
     import pandas as pd
@@ -153,5 +153,6 @@ elif st.session_state.role == "User":
 
     st.title("User Dashboard")
     st.info("Limited access view")
+
 
 
