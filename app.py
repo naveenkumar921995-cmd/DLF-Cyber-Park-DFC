@@ -150,23 +150,165 @@ elif st.session_state.role == "Admin":
 
     elif menu == "Compliance":
         st.title("Compliance")
-        st.warning("Module under development")
+        elif menu == "Compliance":
+
+    st.title("📋 Compliance Tracker")
+
+    from database.db import get_connection
+    import pandas as pd
+    from datetime import date
+
+    conn = get_connection()
+
+    dept = st.text_input("Department")
+    activity = st.text_input("Compliance Activity")
+    due_date = st.date_input("Due Date", date.today())
+    status = st.selectbox("Status", ["Pending", "Completed"])
+
+    if st.button("Save Compliance"):
+        conn.execute(
+            "INSERT INTO compliance (department, activity, due_date, status) VALUES (?, ?, ?, ?)",
+            (dept, activity, due_date, status)
+        )
+        conn.commit()
+        st.success("Saved Successfully!")
+
+    data = pd.read_sql("SELECT * FROM compliance", conn)
+    st.dataframe(data)
+
+    conn.close()
+
 
     elif menu == "Energy":
         st.title("Energy")
-        st.warning("Module under development")
+        elif menu == "Energy":
+
+    st.title("⚡ Energy Monitoring")
+
+    from database.db import get_connection
+    import pandas as pd
+    from datetime import date
+
+    conn = get_connection()
+
+    dept = st.text_input("Department")
+    reading_date = st.date_input("Reading Date", date.today())
+    units = st.number_input("Units Consumed", min_value=0.0)
+
+    if st.button("Save Reading"):
+        conn.execute(
+            "INSERT INTO energy (department, reading_date, units) VALUES (?, ?, ?)",
+            (dept, reading_date, units)
+        )
+        conn.commit()
+        st.success("Reading Saved!")
+
+    data = pd.read_sql("SELECT department, units FROM energy", conn)
+
+    if not data.empty:
+        st.bar_chart(data.groupby("department").sum())
+
+    conn.close()
+
 
     elif menu == "Attendance":
         st.title("Attendance")
-        st.warning("Module under development")
+        elif menu == "Attendance":
+
+    st.title("👷 Attendance Register")
+
+    from database.db import get_connection
+    import pandas as pd
+    from datetime import date
+
+    conn = get_connection()
+
+    name = st.text_input("Employee Name")
+    dept = st.text_input("Department")
+    att_date = st.date_input("Date", date.today())
+    status = st.selectbox("Status", ["Present", "Absent"])
+
+    if st.button("Save Attendance"):
+        conn.execute(
+            "INSERT INTO attendance (employee_name, department, date, status) VALUES (?, ?, ?, ?)",
+            (name, dept, att_date, status)
+        )
+        conn.commit()
+        st.success("Attendance Saved!")
+
+    data = pd.read_sql("SELECT * FROM attendance", conn)
+    st.dataframe(data)
+
+    conn.close()
+
 
     elif menu == "Purchase":
         st.title("Purchase")
-        st.warning("Module under development")
+        elif menu == "Purchase":
+
+    st.title("🛒 Purchase Register")
+
+    from database.db import get_connection
+    import pandas as pd
+    from datetime import date
+
+    conn = get_connection()
+
+    item = st.text_input("Item Name")
+    dept = st.text_input("Department")
+    qty = st.number_input("Quantity", min_value=1)
+    p_date = st.date_input("Purchase Date", date.today())
+
+    if st.button("Save Purchase"):
+        conn.execute(
+            "INSERT INTO purchase (item_name, department, quantity, date) VALUES (?, ?, ?, ?)",
+            (item, dept, qty, p_date)
+        )
+        conn.commit()
+        st.success("Purchase Saved!")
+
+    data = pd.read_sql("SELECT * FROM purchase", conn)
+    st.dataframe(data)
+
+    conn.close()
 
     elif menu == "Reports":
         st.title("Reports")
-        st.warning("Module under development")
+        elif menu == "Reports":
+
+    st.title("📊 Reports")
+
+    from database.db import get_connection
+    import pandas as pd
+
+    conn = get_connection()
+
+    report_type = st.selectbox(
+        "Select Report",
+        ["Assets", "Work Logs", "Compliance", "Energy", "Attendance", "Purchase"]
+    )
+
+    table_map = {
+        "Assets": "assets",
+        "Work Logs": "work_logs",
+        "Compliance": "compliance",
+        "Energy": "energy",
+        "Attendance": "attendance",
+        "Purchase": "purchase"
+    }
+
+    data = pd.read_sql(f"SELECT * FROM {table_map[report_type]}", conn)
+
+    st.dataframe(data)
+
+    st.download_button(
+        "Download as CSV",
+        data.to_csv(index=False),
+        file_name=f"{report_type}.csv",
+        mime="text/csv"
+    )
+
+    conn.close()
 
     # -------------------------
     # LOGOUT
@@ -183,3 +325,4 @@ elif st.session_state.role == "User":
 
     st.title("User Dashboard")
     st.info("Limited access view")
+
