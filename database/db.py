@@ -48,6 +48,17 @@ def init_db():
             "INSERT INTO departments (name) VALUES (?)",
             departments
         )
+# Assets Table
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS assets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        asset_id TEXT,
+        asset_name TEXT,
+        department TEXT,
+        location TEXT
+    )
+""")
 
     conn.commit()
     conn.close()
+
