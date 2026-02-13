@@ -5,50 +5,52 @@ from database.db import get_connection
 
 def asset_page():
 
-    st.title("🏢 Asset Management")
+    st.title("🏢 Asset Master Upload")
 
-    with st.expander("➕ Add New Asset", expanded=True):
+    uploaded_file = st.file_uploader(
+        "Upload Asset Master Excel File",
+        type=["xlsx"]
+    )
 
-        col1, col2 = st.columns(2)
+    if uploaded_file is not None:
 
-        with col1:
-            asset_id = st.text_input("Asset ID")
-            department = st.selectbox(
-                "Department",
-                [
-                    "HVAC","Electrical","DG","STP","WTP",
-                    "Fire Fighting","CCTV & Access","Lifts",
-                    "BMS","Facade","Civil"
-                ]
-            )
+        df = pd.read_excel(uploaded_file)
 
-        with col2:
-            asset_name = st.text_input("Asset Name")
-            location = st.text_input("Location")
+        required_columns = [
+            "asset_id",
+            "asset_name",
+            "department",
+            "location"
+        ]
 
-        if st.button("Save Asset"):
-            if asset_id and asset_name:
+        if all(col in df.columns for col in required_columns):
 
-                conn = get_connection()
-                cursor = conn.cursor()
+            conn = get_connection()
+            cursor = conn.cursor()
 
+            for _, row in df.iterrows():
                 cursor.execute("""
                     INSERT INTO assets (asset_id, asset_name, department, location)
                     VALUES (?, ?, ?, ?)
-                """, (asset_id, asset_name, department, location))
+                """, (
+                    row["asset_id"],
+                    row["asset_name"],
+                    row["department"],
+                    row["location"]
+                ))
 
-                conn.commit()
-                conn.close()
+            conn.commit()
+            conn.close()
 
-                st.success("✅ Asset Saved Successfully")
+            st.success("✅ Assets Uploaded Successfully")
 
-            else:
-                st.error("Asset ID and Asset Name are required")
+        else:
+            st.error("Excel format incorrect. Please use proper template.")
 
     st.divider()
 
-    # Show all assets
-    st.subheader("📋 All Assets")
+    # Show Current Assets
+    st.subheader("Current Asset List")
 
     conn = get_connection()
     df = pd.read_sql("SELECT * FROM assets", conn)
@@ -57,5 +59,4 @@ def asset_page():
     if not df.empty:
         st.dataframe(df, use_container_width=True)
     else:
-        st.info("No assets added yet.")
-
+        st.info("No assets available.")
