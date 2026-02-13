@@ -1,3 +1,76 @@
+import streamlit as st
+from database.db import init_db, get_connection
+from modules.assets import asset_page
+from departments import department_page
+import pandas as pd
+from datetime import date
+
+
+# -------------------------
+# Initialize Database
+# -------------------------
+init_db()
+
+
+# -------------------------
+# Session State Setup
+# -------------------------
+if "role" not in st.session_state:
+    st.session_state.role = None
+
+
+# -------------------------
+# LOGIN SCREEN
+# -------------------------
+if st.session_state.role is None:
+
+    st.title("DLF Cyber Park - Facility Management System")
+
+    role = st.selectbox("Select Role", ["Admin", "User"])
+
+    if st.button("Login"):
+        st.session_state.role = role
+        st.rerun()
+
+
+# -------------------------
+# ADMIN PANEL
+# -------------------------
+elif st.session_state.role == "Admin":
+
+    # Header with Logos
+    col1, col2, col3 = st.columns([1, 3, 1])
+
+    with col1:
+        st.image("assets/dlf_logo.png", width=140)
+
+    with col2:
+        st.markdown(
+            "<h2 style='text-align: center;'>DLF Cyber Park - Facility Management System</h2>",
+            unsafe_allow_html=True
+        )
+
+    with col3:
+        st.image("assets/lnp_logo.png", width=140)
+
+    st.divider()
+
+    # Sidebar
+    st.sidebar.title("Navigation")
+
+    menu = st.sidebar.selectbox("Menu", [
+        "Dashboard",
+        "Assets",
+        "Departments",
+        "Work Logs",
+        "Compliance",
+        "Energy",
+        "Attendance",
+        "Purchase",
+        "Reports",
+        "Logout"
+    ])
+
     # -------------------------
     # DASHBOARD
     # -------------------------
@@ -5,16 +78,12 @@
 
         st.title("🏢 Facility Control Room")
 
-        from database.db import get_connection
-        import pandas as pd
-
         conn = get_connection()
 
-        total_assets_df = pd.read_sql(
+        total_assets = pd.read_sql(
             "SELECT COUNT(*) as count FROM assets",
             conn
-        )
-        total_assets = total_assets_df["count"][0]
+        )["count"][0]
 
         dept_data = pd.read_sql("""
             SELECT department, COUNT(*) as count
@@ -67,12 +136,7 @@
 
         st.title("🛠 Work Log Entry")
 
-        from database.db import get_connection
-        import pandas as pd
-        from datetime import date
-
         conn = get_connection()
-
         assets_df = pd.read_sql("SELECT asset_id, asset_name FROM assets", conn)
 
         if not assets_df.empty:
@@ -96,7 +160,6 @@
                     "INSERT INTO work_logs (asset_id, work_date, issue, action_taken) VALUES (?, ?, ?, ?)",
                     (asset_id, work_date, issue, action)
                 )
-
                 conn.commit()
                 st.success("Work log saved!")
 
@@ -111,10 +174,6 @@
     elif menu == "Compliance":
 
         st.title("📋 Compliance Tracker")
-
-        from database.db import get_connection
-        import pandas as pd
-        from datetime import date
 
         conn = get_connection()
 
@@ -142,10 +201,6 @@
     elif menu == "Energy":
 
         st.title("⚡ Energy Monitoring")
-
-        from database.db import get_connection
-        import pandas as pd
-        from datetime import date
 
         conn = get_connection()
 
@@ -175,10 +230,6 @@
 
         st.title("👷 Attendance Register")
 
-        from database.db import get_connection
-        import pandas as pd
-        from datetime import date
-
         conn = get_connection()
 
         name = st.text_input("Employee Name")
@@ -205,10 +256,6 @@
     elif menu == "Purchase":
 
         st.title("🛒 Purchase Register")
-
-        from database.db import get_connection
-        import pandas as pd
-        from datetime import date
 
         conn = get_connection()
 
@@ -237,13 +284,10 @@
 
         st.title("📊 Reports")
 
-        from database.db import get_connection
-        import pandas as pd
-
         conn = get_connection()
 
         report_type = st.selectbox(
-            "Select Report",
+            "Select Table",
             ["assets", "work_logs", "compliance", "energy", "attendance", "purchase"]
         )
 
@@ -266,3 +310,12 @@
     elif menu == "Logout":
         st.session_state.role = None
         st.rerun()
+
+
+# -------------------------
+# USER PANEL
+# -------------------------
+elif st.session_state.role == "User":
+
+    st.title("User Dashboard")
+    st.info("Limited access view")
