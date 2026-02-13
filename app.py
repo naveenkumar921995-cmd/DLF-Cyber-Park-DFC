@@ -1,7 +1,8 @@
 import streamlit as st
 from database.db import init_db
 from modules.assets import asset_page
-from modules.departments import department_page
+from departments import department_page
+
 
 # -------------------------
 # Initialize Database
@@ -119,3 +120,4 @@ elif st.session_state.role == "User":
 
     st.title("User Dashboard")
     st.info("Limited access view")
+
