@@ -34,6 +34,25 @@ if st.session_state.role is None:
 # ADMIN PANEL
 # -------------------------
 elif st.session_state.role == "Admin":
+    # -------------------------
+    # HEADER WITH LOGOS
+    # -------------------------
+    col1, col2, col3 = st.columns([1, 3, 1])
+
+    with col1:
+        st.image("assets/dlf_logo.png", width=140)
+
+    with col2:
+        st.markdown(
+            "<h2 style='text-align: center;'>DLF Cyber Park - Facility Management System</h2>",
+            unsafe_allow_html=True
+        )
+
+    with col3:
+        st.image("assets/lnp_logo.png", width=140)
+
+    st.divider()
+
     # Header with Logos
     col1, col2, col3 = st.columns([1, 3, 1])
 
@@ -181,4 +200,5 @@ elif st.session_state.role == "User":
 
     st.title("User Dashboard")
     st.info("Limited access view")
+
 
