@@ -1,5 +1,11 @@
 import sqlite3
+import os
+
+DB_PATH = "data/facility.db"
 
 def get_connection():
-    conn = sqlite3.connect("data/facility.db", check_same_thread=False)
+    # Ensure data folder exists
+    os.makedirs("data", exist_ok=True)
+    
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     return conn
