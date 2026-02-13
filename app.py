@@ -34,6 +34,7 @@ if st.session_state.role is None:
 # ADMIN PANEL
 # -------------------------
 elif st.session_state.role == "Admin":
+
     # -------------------------
     # HEADER WITH LOGOS
     # -------------------------
@@ -53,23 +54,9 @@ elif st.session_state.role == "Admin":
 
     st.divider()
 
-    # Header with Logos
-    col1, col2, col3 = st.columns([1, 3, 1])
-
-    with col1:
-        st.image("assets/logo.png", width=120)
-
-    with col2:
-        st.markdown(
-            "<h2 style='text-align: center;'>DLF Cyber Park Facility Management System</h2>",
-            unsafe_allow_html=True
-        )
-
-    with col3:
-        st.image("assets/logo.png", width=120)
-
-    st.divider()
-
+    # -------------------------
+    # SIDEBAR NAVIGATION
+    # -------------------------
     st.sidebar.title("Navigation")
 
     menu = st.sidebar.selectbox("Menu", [
@@ -97,14 +84,12 @@ elif st.session_state.role == "Admin":
 
         conn = get_connection()
 
-        # Total Assets
         total_assets_df = pd.read_sql(
             "SELECT COUNT(*) as count FROM assets",
             conn
         )
         total_assets = total_assets_df["count"][0]
 
-        # Department-wise Count
         dept_data = pd.read_sql("""
             SELECT department, COUNT(*) as count
             FROM assets
@@ -113,7 +98,6 @@ elif st.session_state.role == "Admin":
 
         conn.close()
 
-        # KPI Cards
         col1, col2 = st.columns(2)
 
         with col1:
@@ -124,7 +108,6 @@ elif st.session_state.role == "Admin":
 
         st.divider()
 
-        # Department Chart
         st.subheader("Assets by Department")
 
         if not dept_data.empty:
@@ -200,5 +183,3 @@ elif st.session_state.role == "User":
 
     st.title("User Dashboard")
     st.info("Limited access view")
-
-
