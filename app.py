@@ -15,6 +15,7 @@ init_db()
 if "role" not in st.session_state:
     st.session_state.role = None
 
+
 # -------------------------
 # LOGIN SCREEN
 # -------------------------
@@ -27,6 +28,7 @@ if st.session_state.role is None:
     if st.button("Login"):
         st.session_state.role = role
         st.rerun()
+
 
 # -------------------------
 # ADMIN PANEL
@@ -53,46 +55,55 @@ elif st.session_state.role == "Admin":
     # -------------------------
     if menu == "Dashboard":
 
-    st.title("🏢 Facility Control Room")
+        st.title("🏢 Facility Control Room")
 
-    from database.db import get_connection
-    import pandas as pd
+        from database.db import get_connection
+        import pandas as pd
 
-    conn = get_connection()
+        conn = get_connection()
 
-    # Total Assets
-    total_assets = pd.read_sql("SELECT COUNT(*) as count FROM assets", conn)
-    total_assets = total_assets["count"][0]
-
-    # Department-wise Count
-    dept_data = pd.read_sql("""
-        SELECT department, COUNT(*) as count
-        FROM assets
-        GROUP BY department
-    """, conn)
-
-    conn.close()
-
-    # KPI Cards
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.metric("Total Assets", total_assets)
-
-    with col2:
-        st.metric("Active Departments", len(dept_data))
-
-    st.divider()
-
-    # Department Chart
-    st.subheader("Assets by Department")
-
-    if not dept_data.empty:
-        st.bar_chart(
-            dept_data.set_index("department")
+        # Total Assets
+        total_assets_df = pd.read_sql(
+            "SELECT COUNT(*) as count FROM assets",
+            conn
         )
-    else:
-        st.info("No assets added yet.")
+        total_assets = total_assets_df["count"][0]
+
+        # Department-wise Count
+        dept_data = pd.read_sql("""
+            SELECT department, COUNT(*) as count
+            FROM assets
+            GROUP BY department
+        """, conn)
+
+        conn.close()
+
+        # KPI Cards
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric("Total Assets", total_assets)
+
+        with col2:
+            st.metric("Active Departments", len(dept_data))
+
+        st.divider()
+
+        # Department Chart
+        st.subheader("Assets by Department")
+
+        if not dept_data.empty:
+            st.bar_chart(
+                dept_data.set_index("department")
+            )
+        else:
+            st.info("No assets added yet.")
+
+    # -------------------------
+    # ASSETS
+    # -------------------------
+    elif menu == "Assets":
+        asset_page()
 
     # -------------------------
     # DEPARTMENTS
@@ -146,13 +157,11 @@ elif st.session_state.role == "Admin":
         st.session_state.role = None
         st.rerun()
 
+
 # -------------------------
-# USER PANEL (Basic View)
+# USER PANEL
 # -------------------------
 elif st.session_state.role == "User":
 
     st.title("User Dashboard")
     st.info("Limited access view")
-
-
-
