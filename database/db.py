@@ -10,6 +10,60 @@ def get_connection():
 
 
 def init_db():
+    # Work Logs
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS work_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER,
+    work_date DATE,
+    issue TEXT,
+    action_taken TEXT
+)
+""")
+
+# Compliance
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS compliance (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    department TEXT,
+    activity TEXT,
+    due_date DATE,
+    status TEXT
+)
+""")
+
+# Energy Monitoring
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS energy (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    department TEXT,
+    reading_date DATE,
+    units REAL
+)
+""")
+
+# Attendance
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS attendance (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employee_name TEXT,
+    department TEXT,
+    date DATE,
+    status TEXT
+)
+""")
+
+# Purchase
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS purchase (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_name TEXT,
+    department TEXT,
+    quantity INTEGER,
+    date DATE
+)
+""")
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -67,3 +121,4 @@ def init_db():
 
     conn.commit()
     conn.close()
+
