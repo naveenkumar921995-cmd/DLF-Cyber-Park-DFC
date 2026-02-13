@@ -1,59 +1,31 @@
 import sqlite3
-import os
-
-DB_PATH = "data/facility.db"
-
-def get_connection():
-    os.makedirs("data", exist_ok=True)
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    return conn
-
 
 def init_db():
-    conn = get_connection()
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        password TEXT,
-        role TEXT,
-        department TEXT
-    )
+        CREATE TABLE IF NOT EXISTS departments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE
+        )
     """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS assets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        asset_id TEXT,
-        asset_name TEXT,
-        department TEXT,
-        location TEXT,
-        capacity TEXT,
-        make TEXT,
-        model TEXT,
-        amc_expiry TEXT,
-        criticality TEXT
-    )
-    """)
+    # Insert default departments if empty
+    cursor.execute("SELECT COUNT(*) FROM departments")
+    count = cursor.fetchone()[0]
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS work_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT,
-        shift TEXT,
-        asset_id TEXT,
-        department TEXT,
-        work_type TEXT,
-        priority TEXT,
-        description TEXT,
-        downtime REAL,
-        spares TEXT,
-        status TEXT,
-        created_by TEXT
-    )
-    """)
+    if count == 0:
+        departments = [
+            ("Electrical",),
+            ("Mechanical",),
+            ("Housekeeping",),
+            ("Security",)
+        ]
+        cursor.executemany(
+            "INSERT INTO departments (name) VALUES (?)",
+            departments
+        )
 
     conn.commit()
     conn.close()
